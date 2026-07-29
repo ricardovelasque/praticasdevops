@@ -1,0 +1,33 @@
+name: Práticas DevOps - Deploy PWA
+
+on:
+  push:
+    branches: [ main ] # Roda sempre que houver push na branch principal
+
+permissions:
+  contents: write # Permissão obrigatória para gravar na branch gh-pages
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Passo 1: Copia o código do aluno para a máquina virtual do GitHub
+    - name: checkout-codigo
+      uses: actions/checkout@v4
+
+    # Passo 2: Simula uma etapa de Teste/Validação (Conceito de CI)
+    # Verifica se os arquivos obrigatórios do PWA realmente existem antes de publicar
+    - name: Valida a estrutura do PWA
+      run: |
+        echo "Iniciando validação de arquivos obrigatórios para a aula..."
+        test -f index.html && echo "✓ index.html encontrado no sistema" || (echo "✗ Erro: index.html está ausente" && exit 1)
+        test -f manifest.json && echo "✓ manifest.json encontrado no sistema" || (echo "✗ Erro: manifest.json está ausente" && exit 1)
+        test -f sw.js && echo "✓ sw.js encontrado no sistema" || (echo "✗ Erro: sw.js está ausente" && exit 1)
+
+    # Passo 3: Deploy automatizado no GitHub Pages (Conceito de CD)
+    - name: Deploy do projeto no GitHub Pages 
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: . # Publica a raiz do projeto
+        branch: gh-pages # Cria e atualiza a branch de publicação de forma automática
