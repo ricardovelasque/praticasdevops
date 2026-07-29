@@ -1,4 +1,4 @@
-const CACHE_NAME = "meu-pwa-cache-v1";
+const CACHE_NAME = 'task-pwa-v2';
 const FILES_TO_CACHE = [
   "index.html",
   "sobre.html",
@@ -9,30 +9,41 @@ const FILES_TO_CACHE = [
   "icons/logo.jpg"
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES_TO_CACHE);
+// Instalação: Salva os arquivos essenciais no cache
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      // Força o cache do index mesmo se a URL terminar apenas com a barra "/" do repositório
+      cache.add(''); 
+      return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
+// Ativação: Limpa caches antigos
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
-  self.clients.claim();
 });
 
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+// Estratégia de Cache: Cache First, depois Rede (Tratando as rotas do GitHub Pages)
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    // O {ignoreSearch: true} ignora parâmetros extras na URL que o GitHub Pages põe às vezes
+    caches.match(e.request, {ignoreSearch: true}).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(e.request);
     })
   );
 });
