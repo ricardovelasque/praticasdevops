@@ -1,6 +1,6 @@
 {
-  "name": "Meu Primeiro PWA",
-  "short_name": "MeuPWA",
+  "name": "Praticas DevOps",
+  "short_name": "DevOps PWA",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -18,3 +18,7 @@
     }
   ]
 }
+
+
+
+
